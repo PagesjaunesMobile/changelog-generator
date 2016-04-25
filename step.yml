@@ -1,0 +1,44 @@
+title: generate Changelog 
+summary: 
+description: |-
+  generate Changelog.
+website: https://github.com/?/changelog-generator
+source_code_url: https://github.com/?/changelog-generator
+support_url: https://github.com/?/changelog-generator/issues
+host_os_tags:
+  - osx-10.9
+  - osx-10.10
+project_type_tags: []
+type_tags:
+  - script
+  - ruby
+  - runner
+  - glue
+is_requires_admin_user: true
+is_always_run: false
+is_skippable: false
+dependencies: []
+run_if: ""
+inputs:
+  - TAG_DEST: ""
+    opts:
+      title: "last tag used"
+      description: ""
+      summary: ""
+      is_expand: true
+      is_required: true
+      is_dont_change_value: true
+  - CHANGE_FILE: ""
+    opts:
+      title: "the changelog file"
+      description: ""
+      summary: ""
+      is_expand: true
+      is_required: false
+      is_dont_change_value: true
+outputs:
+  - CHANGELOG:
+    opts:
+      title: changelog markdown data
+      description: |-
+        markdown formated changelog.
