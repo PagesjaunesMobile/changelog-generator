@@ -18,13 +18,16 @@ git config --global user.name $IC_COMMITER_NAME
 
 if [ -n "$CHANGE_FILE" ] ; then
 	touch $CHANGE_FILE
-$THIS_SCRIPT_DIR/changelog.js $TAG_DEST "${CHANGE_FILE}" $previousTag
-GIT_ASKPASS=echo 
-GIT_SSH="${THIS_SCRIPT_DIR}/ssh_no_prompt.sh"
-git add $CHANGE_FILE
-git commit -m "chore(${TAG_DEST}):update changes"
-git push origin HEAD:$BITRISE_GIT_BRANCH
+	ALREADY=$(grep "^# ${TAG_DEST}" $CHANGE_FILE)  # or ALREADY = tag <> HEAD
+	if [ -z "$ALREADY" ]; then 
+		$THIS_SCRIPT_DIR/changelog.js $TAG_DEST "${CHANGE_FILE}" $previousTag
+		GIT_ASKPASS=echo 
+		GIT_SSH="${THIS_SCRIPT_DIR}/ssh_no_prompt.sh"
+		git add $CHANGE_FILE
+		git commit -m "chore(${TAG_DEST}):update changes"
+		git push origin HEAD:$BITRISE_GIT_BRANCH
+	fi
 fi
 
-envman add --key CHANGELOG --value "#{$($THIS_SCRIPT_DIR/changelog.js $TAG_DEST '' $previousTag)}"
+envman add --key CHANGELOG --value "$($THIS_SCRIPT_DIR/changelog.js $TAG_DEST '' $previousTag)"
 
