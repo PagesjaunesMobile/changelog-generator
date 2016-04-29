@@ -9,7 +9,7 @@ npm install
 
 cd $BITRISE_SOURCE_DIR
 
-
+ALREADY=$(grep "^# ${TAG_DEST}" $CHANGE_FILE) 
 git checkout ${TAG_DEST}~1
 previousTag=$(git describe --tags --abbrev=0)
 git checkout ${TAG_DEST}
@@ -18,7 +18,7 @@ git config --global user.name $IC_COMMITER_NAME
 
 if [ -n "$CHANGE_FILE" ] ; then
 	touch $CHANGE_FILE
-	ALREADY=$(grep "^# ${TAG_DEST}" $CHANGE_FILE)  # or ALREADY = tag <> HEAD
+	 # or ALREADY = tag <> HEAD
 	if [ -z "$ALREADY" ]; then 
 		$THIS_SCRIPT_DIR/changelog.js $TAG_DEST "${CHANGE_FILE}" $previousTag
 		GIT_ASKPASS=echo 
