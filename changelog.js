@@ -10,6 +10,12 @@
 
 'use strict';
 
+if (!Array.prototype.last){
+    Array.prototype.last = function(){
+        return this[this.length - 1];
+    };
+};
+
 var fs = require('fs');
 var util = require('util');
 var child = require('child_process');
@@ -20,6 +26,7 @@ var GIT_LOG_CMD = 'git log --grep="%s" -E --format=%s %s..%s';
 var GIT_TAG_CMD = 'git describe --tags --abbrev=0';
 var GIT_TAG_DATE_CMD = 'git log -1 --format=%ai %s';
 var HEADER_TPL = '<a name="%s"></a>\n# %s (%s)\n\n';
+var HEADLESS_TPL = 'Last commit _%s\n\n';
 var LINK_ISSUE = '[#%s](process.env.ISSUE_TRACKER/%s)';
 var LINK_COMMIT = '[%s](process.env.GIT_COMMIT_LINK/%s)';
 
@@ -72,7 +79,9 @@ var parseRawCommit = function(raw) {
   } else
   return null;
 };
-
+var authorCommit = function(commit) {
+  return commit.split('\n').last();
+};
 
 var linkToIssue = function(issue) {
   return util.format(LINK_ISSUE, issue, issue);
@@ -145,7 +154,7 @@ var readGitLog = function(grep, from, to) {
   var deferred = q.defer();
 
   // TODO(vojta): if it's slow, use spawn and stream it instead
-  child.exec(util.format(GIT_LOG_CMD, grep, '%H%n%s%n%b%n==END==', from, to), function(code, stdout, stderr) {
+  child.exec(util.format(GIT_LOG_CMD, grep, '%H%n%s%n%b%n%an%n==END==', from, to), function(code, stdout, stderr) {
     var commits = [];
     stdout.split('\n==END==\n').forEach(function(rawCommit) {
       var commit = parseRawCommit(rawCommit);
@@ -189,9 +198,12 @@ var writeChangelog = function(data, stream, commits, version, date) {
     }
   });
 
-
-
-  stream.write(util.format(HEADER_TPL, version, version, currentDate(date)));
+  if (version == "HEAD") {
+    stream.write(util.format(HEADLESS_TPL, date));
+  } else {
+     stream.write(util.format(HEADER_TPL, version, version, currentDate(date)));
+   }
+  
   printSection(stream, 'Bug Fixes', sections.fix);
   printSection(stream, 'Features', sections.feat);
   printSection(stream, 'Performance Improvements', sections.perf);
@@ -222,13 +234,14 @@ var generate = function(data, file, to, from) {
     return stdout;
   });
 
-  if(from==null){
+  if(from==null || to == "HEAD"){
     getPreviousTag().then(function(tag) {
       console.log('Reading git log since', tag);
       readGitLog('^fix|^feat|^perf|BREAKING', tag, "HEAD").then(function(commits) {
         console.log('Parsed', commits.length, 'commits');
         console.log('Generating changelog to', file || 'stdout', '(', to, ')');
-        writeChangelog(data, stream, commits, to, tagDate);
+      //  console.log('>>>>>>',commits[0],'<<<<<')
+        writeChangelog(data, stream, commits, to, commits[0].subject + "_ (" + authorCommit(commits[0].body) + ")");
       });
     });
   } else {
