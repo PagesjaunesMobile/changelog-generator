@@ -34,7 +34,7 @@ var EMPTY_COMPONENT = '$$';
 
 
 var warn = function() {
-  console.log('WARNING:', util.format.apply(null, arguments));
+  console.error('WARNING:', util.format.apply(null, arguments));
 };
 
 
@@ -57,7 +57,7 @@ var parseRawCommit = function(raw) {
   match = raw.match(/BREAKING CHANGE:([\s\S]*)/);
 
   if (match) {
-    console.log("BREAK >%s<", match[1]);
+    console.error("BREAK >%s<", match[1]);
     msg.breaking = match[1];
   }
 
@@ -236,19 +236,19 @@ var generate = function(data, file, to, from) {
 
   if(from==null || to == "HEAD"){
     getPreviousTag().then(function(tag) {
-      console.log('Reading git log since', tag);
+      console.error('Reading git log since', tag);
       readGitLog('^fix|^feat|^perf|BREAKING', tag, "HEAD").then(function(commits) {
-        console.log('Parsed', commits.length, 'commits');
-        console.log('Generating changelog to', file || 'stdout', '(', to, ')');
-      //  console.log('>>>>>>',commits[0],'<<<<<')
+        console.error('Parsed', commits.length, 'commits');
+        console.error('Generating changelog to', file || 'stdout', '(', to, ')');
+      //  console.error('>>>>>>',commits[0],'<<<<<')
         writeChangelog(data, stream, commits, to, commits[0].subject + "_ (" + authorCommit(commits[0].body) + ")");
       });
     });
   } else {
-    console.log('Reading git log between %s and %s (%s)', from, to, tagDate.toString());
+    console.error('Reading git log between %s and %s (%s)', from, to, tagDate.toString());
     readGitLog('^fix|^feat|^perf|BREAKING', from, to).then(function(commits) {
-      console.log('Parsed', commits.length, 'commits');
-      console.log('Generating changelog to', file || 'stdout', '(', to, ')');
+      console.error('Parsed', commits.length, 'commits');
+      console.error('Generating changelog to', file || 'stdout', '(', to, ')');
       writeChangelog(data, stream, commits, to, tagDate);
     });
   };
@@ -260,7 +260,7 @@ var generate = function(data, file, to, from) {
 exports.parseRawCommit = parseRawCommit;
 exports.printSection = printSection;
 // hacky start if not run by jasmine :-D
-//console.log(child);
+//console.error(child);
 var file = process.argv[3];
 
 var chunk='';
@@ -275,8 +275,8 @@ if (file){
   });
 
   streamOld.on( 'end' ,  function ()  {
-    console.log("here "+ chunk.length);
-    console.log( 'Read completed successfully.' );
+    console.error("here "+ chunk.length);
+    console.error( 'Read completed successfully.' );
     generate(chunk, file, process.argv[2], process.argv[4]);
   });
 
