@@ -28,6 +28,7 @@ var GIT_TAG_DATE_CMD = 'git log -1 --format=%ai %s';
 var HEADER_TPL = '<a name="%s"></a>\n# %s (%s)\n\n';
 var HEADLESS_TPL = 'Last commit _%s\n\n';
 var LINK_ISSUE = '[#%s](process.env.ISSUE_TRACKER/%s)';
+var LINK_FEATURE = "[%s](https://wiki.services.local/dosearchsite.action?spaceSearch=false&queryString='%s')";
 var LINK_COMMIT = '[%s](process.env.GIT_COMMIT_LINK/%s)';
 
 var EMPTY_COMPONENT = '$$';
@@ -50,8 +51,8 @@ var parseRawCommit = function(raw) {
   msg.breaks = [];
 
   lines.forEach(function(line) {
-    match = line.match(/(?:Closes|Fixes)\s#(\d+)/);
-    if (match) msg.closes.push(parseInt(match[1]));
+    match = line.match(/(?:Closes|Fixes|Features)\s#?([A-Z0-9_\-]+)/);
+    if (match) msg.closes.push(match[1]);
   });
 
   match = raw.match(/BREAKING CHANGE:([\s\S]*)/);
@@ -84,7 +85,11 @@ var authorCommit = function(commit) {
 };
 
 var linkToIssue = function(issue) {
-  return util.format(LINK_ISSUE, issue, issue);
+  if (issue.match(/^[A-Z]+-[0-9]+$/)) {
+    return util.format(LINK_ISSUE, issue, issue);
+  }
+  
+  return util.format(LINK_FEATURE, issue, issue);
 };
 
 
