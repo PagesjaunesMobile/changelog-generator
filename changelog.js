@@ -71,6 +71,7 @@ var parseRawCommit = function(raw) {
       warn('Incorrect message: %s %s', msg.hash, msg.subject);
       msg.type='bof';
       msg.component='?';
+      console.log("\nHERE >>>>> %s \n>>>> %s\n ", msg.subject, msg.body);
     } else {
       msg.type = match[1];
       msg.component = match[2];
