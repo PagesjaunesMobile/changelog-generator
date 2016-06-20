@@ -32,6 +32,6 @@ if [ -e "$CHANGE_FILE" ] ; then
 		git push origin HEAD:$BITRISE_GIT_BRANCH
 	fi
 fi
-git log -3 
+git log --invert-grep --grep="^Merge" -E --format=%H%n%s%n%b%n%an%n==END== ${previousTag}..${TAG_DEST}
 envman add --key CHANGELOG --value "$($THIS_SCRIPT_DIR/changelog.js $TAG_DEST '' $previousTag)"
 
