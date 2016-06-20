@@ -32,6 +32,6 @@ if [ -e "$CHANGE_FILE" ] ; then
 		git push origin HEAD:$BITRISE_GIT_BRANCH
 	fi
 fi
-
+git log -3 
 envman add --key CHANGELOG --value "$($THIS_SCRIPT_DIR/changelog.js $TAG_DEST '' $previousTag)"
 
