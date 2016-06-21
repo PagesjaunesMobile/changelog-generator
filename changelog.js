@@ -161,8 +161,8 @@ var readGitLog = function(grep, from, to) {
   var deferred = q.defer();
 
   // TODO(vojta): if it's slow, use spawn and stream it instead
-  console.log(util.format(GIT_LOG_CMD, grep, '%H%n%s%n%b%n%an%n==END==', from, to));
-  console.log(child.exec("pwd; cat .git/config"));
+  console.error(util.format(GIT_LOG_CMD, grep, '%H%n%s%n%b%n%an%n==END==', from, to));
+  //console.log(child.exec("pwd; cat .git/config"));
   child.exec(util.format(GIT_LOG_CMD, grep, '%H%n%s%n%b%n%an%n==END==', from, to), function(code, stdout, stderr) {
     var commits = [];
     stdout.split('\n==END==\n').forEach(function(rawCommit) {
