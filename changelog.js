@@ -22,7 +22,7 @@ var child = require('child_process');
 
 var q = require('qq');
 
-var GIT_LOG_CMD = 'git log --grep="%s" -E --format=%s %s..%s';
+var GIT_LOG_CMD = 'git log --invert-grep --grep="%s" -E --format=%s %s..%s';
 var GIT_TAG_CMD = 'git describe --tags --abbrev=0';
 var GIT_TAG_DATE_CMD = 'git log -1 --format=%ai %s';
 var HEADER_TPL = '<a name="%s"></a>\n# %s (%s)\n\n';
@@ -71,7 +71,8 @@ var parseRawCommit = function(raw) {
       warn('Incorrect message: %s %s', msg.hash, msg.subject);
       msg.type='bof';
       msg.component='?';
-      console.log("\nHERE >>>>> %s \n>>>> %s\n ", msg.subject, msg.body);
+      msg.subject= msg.subject+ " par *" +  authorCommit(msg.body) +"*";
+     // console.log("\nHERE >>>>> %s \n>>>> %s\n ", msg.subject, msg.body);
     } else {
       msg.type = match[1];
       msg.component = match[2];
@@ -160,6 +161,8 @@ var readGitLog = function(grep, from, to) {
   var deferred = q.defer();
 
   // TODO(vojta): if it's slow, use spawn and stream it instead
+  console.log(util.format(GIT_LOG_CMD, grep, '%H%n%s%n%b%n%an%n==END==', from, to));
+  console.log(child.exec("pwd; cat .git/config"));
   child.exec(util.format(GIT_LOG_CMD, grep, '%H%n%s%n%b%n%an%n==END==', from, to), function(code, stdout, stderr) {
     var commits = [];
     stdout.split('\n==END==\n').forEach(function(rawCommit) {
@@ -243,7 +246,7 @@ var generate = function(data, file, to, from) {
   if(from==null || to == "HEAD"){
     getPreviousTag().then(function(tag) {
       console.error('Reading git log since', tag);
-      readGitLog('^fix|^feat|^perf|BREAKING', tag, "HEAD").then(function(commits) {
+      readGitLog('^Merge', tag, "HEAD").then(function(commits) {
         console.error('Parsed', commits.length, 'commits');
         console.error('Generating changelog to', file || 'stdout', '(', to, ')');
       //  console.error('>>>>>>',commits[0],'<<<<<')
@@ -252,7 +255,7 @@ var generate = function(data, file, to, from) {
     });
   } else {
     console.error('Reading git log between %s and %s (%s)', from, to, tagDate.toString());
-    readGitLog('^fix|^feat|^perf|BREAKING', from, to).then(function(commits) {
+    readGitLog('^Merge', from, to).then(function(commits) {
       console.error('Parsed', commits.length, 'commits');
       console.error('Generating changelog to', file || 'stdout', '(', to, ')');
       writeChangelog(data, stream, commits, to, tagDate);
