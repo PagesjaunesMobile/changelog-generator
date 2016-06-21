@@ -22,14 +22,18 @@ var child = require('child_process');
 
 var q = require('qq');
 
+var lite = false;
 var GIT_LOG_CMD = 'git log --invert-grep --grep="%s" -E --format=%s %s..%s';
 var GIT_TAG_CMD = 'git describe --tags --abbrev=0';
 var GIT_TAG_DATE_CMD = 'git log -1 --format=%ai %s';
 var HEADER_TPL = '<a name="%s"></a>\n# %s (%s)\n\n';
 var HEADLESS_TPL = 'Last commit _%s\n\n';
+var LINK_ISSUE_LITE = '[#%s]';
+var LINK_FEATURE_LITE = "[%s]";
+var LINK_COMMIT_LITE = '[%s]';
 var LINK_ISSUE = '[#%s](process.env.ISSUE_TRACKER/%s)';
 var LINK_FEATURE = "[%s](https://wiki.services.local/dosearchsite.action?spaceSearch=false&queryString='%s')";
-var LINK_COMMIT = '[%s](process.env.GIT_COMMIT_LINK/%s)';
+var LINK_COMMIT = '([%s](process.env.GIT_COMMIT_LINK/%s))';
 
 var EMPTY_COMPONENT = '$$';
 
@@ -88,14 +92,22 @@ var authorCommit = function(commit) {
 
 var linkToIssue = function(issue) {
   if (issue.match(/^[A-Z]+-[0-9]+$/)) {
+    if (lite == true){
+      return util.format(LINK_ISSUE_LITE, issue);
+    } else
     return util.format(LINK_ISSUE, issue, issue);
   }
-  
+  if (lite == true){
+    return util.format(LINK_FEATURE_LITE, issue);
+  } else
   return util.format(LINK_FEATURE, issue, issue);
 };
 
 
 var linkToCommit = function(hash) {
+  if (lite == true){
+    return "";
+  } else
   return util.format(LINK_COMMIT, hash.substr(0, 8), hash);
 };
 
@@ -142,11 +154,11 @@ var printSection = function(stream, title, section, printCommitLinks) {
     section[name].forEach(function(commit) {
 
       if (printCommitLinks) {
-        stream.write(util.format('%s %s\n  (%s', prefix, commit.subject, linkToCommit(commit.hash)));
+        stream.write(util.format('%s %s\n  %s', prefix, commit.subject, linkToCommit(commit.hash)));
         if (commit.closes.length) {
           stream.write(',\n   ' + commit.closes.map(linkToIssue).join(', '));
         }
-        stream.write(')\n');
+        stream.write('\n');
       } else {
         stream.write(util.format('%s %s\n', prefix, commit.subject));
       }
@@ -270,6 +282,12 @@ exports.parseRawCommit = parseRawCommit;
 exports.printSection = printSection;
 // hacky start if not run by jasmine :-D
 //console.error(child);
+
+if (process.argv[5].indexOf("lite")>0){
+  
+  lite=true;
+}
+
 var file = process.argv[3];
 
 var chunk='';
