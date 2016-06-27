@@ -165,16 +165,13 @@ var LINK_FEATURE = "[%s](https://wiki.services.local/dosearchsite.action?spaceSe
           {
             stream.write(linkToCommit(commit.hash));
           } else {
-            stream.write('\n');
             stream.write(util.format('%s %s\n  %s', prefix, commit.subject, linkToCommit(commit.hash)));
           }
           if (commit.closes.length) {
             stream.write(',\n   ' + commit.closes.map(linkToIssue).join(', '));
           }
-          stream.write('\n');
         } else {
           if (doublon != commit.subject){
-            stream.write('\n');
             stream.write(util.format('%s %s\n', prefix, commit.subject));
           }
         }
