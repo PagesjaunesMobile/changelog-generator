@@ -16,10 +16,11 @@ fi
 
 previousTag=$(git describe --tags --abbrev=0)
 git checkout ${TAG_DEST}
-git config --global user.email $IC_COMMITER_MAIL
-git config --global user.name $IC_COMMITER_NAME
+
 
 if [ -e "$CHANGE_FILE" ] ; then
+  git config --global user.email $IC_COMMITER_MAIL
+  git config --global user.name $IC_COMMITER_NAME
   ALREADY=$(grep "^# ${TAG_DEST}" $CHANGE_FILE) 
 	touch $CHANGE_FILE
 	 # or ALREADY = tag <> HEAD
