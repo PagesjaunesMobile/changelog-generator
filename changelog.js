@@ -185,9 +185,9 @@ var LINK_FEATURE = "[%s](https://wiki.services.local/dosearchsite.action?spaceSe
     var deferred = q.defer();
 
     // TODO(vojta): if it's slow, use spawn and stream it instead
-    console.error(util.format(GIT_LOG_CMD, grep, '%H%n%s%n%b%n%an%n==END==', from, to));
+    console.error(util.format(GIT_LOG_CMD, grep, '%H%n%B%n%an%n==END==', from, to));
     //console.log(child.exec("pwd; cat .git/config"));
-    child.exec(util.format(GIT_LOG_CMD, grep, '%H%n%s%n%b%n%an%n==END==', from, to), function(code, stdout, stderr) {
+    child.exec(util.format(GIT_LOG_CMD, grep, '%H%n%B%n%an%n==END==', from, to), function(code, stdout, stderr) {
       var commits = [];
       stdout.split('\n==END==\n').forEach(function(rawCommit) {
         var commit = parseRawCommit(rawCommit);
