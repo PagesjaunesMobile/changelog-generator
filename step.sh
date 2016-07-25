@@ -34,5 +34,10 @@ if [ -e "$CHANGE_FILE" ] ; then
 	fi
 fi
   #git log --invert-grep --grep="^Merge" -E --format=%H%n%s%n%b%n%an%n==END== ${previousTag}..${TAG_DEST}
-envman add --key CHANGELOG --value "$($THIS_SCRIPT_DIR/changelog.js $TAG_DEST '' $previousTag --lite)"
+  changelog_final=$($THIS_SCRIPT_DIR/changelog.js $TAG_DEST '' $previousTag --lite)
+  if [ ${#changelog_final} -gt 16000 ]; then
+    changelog_final="${changelog_final:0:8000}\n\n (...)"
+  fi
+  
+envman add --key CHANGELOG --value "${changelog_final}"
 
