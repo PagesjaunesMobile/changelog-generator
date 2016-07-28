@@ -39,7 +39,7 @@ changelog_final=$(echo "$changelog" | head -1 )
  
 changelog_html=$($THIS_SCRIPT_DIR/to_html.rb --md "${changelog}")
 if [ ${#changelog_html} -gt 16000 ]; then
-  changelog_final="${changelog_html:0:16000} <br><br> (...)"
+  changelog_final="${changelog_html:0:10000} <br><br> (...)"
 fi
 
 envman add --key CHANGELOG --value "${changelog_final}"
