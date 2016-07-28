@@ -13,4 +13,5 @@ workflows:
         inputs:
         - content: |-
             echo "-> CHANGELOG: ${CHANGELOG}"
+            echo "-> CHANGELOG: ${CHANGELOG_HTML}"
 
