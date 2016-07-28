@@ -35,9 +35,9 @@ if [ -e "$CHANGE_FILE" ] ; then
 fi
 #git log --invert-grep --grep="^Merge" -E --format=%H%n%s%n%b%n%an%n==END== ${previousTag}..${TAG_DEST}
 changelog=$($THIS_SCRIPT_DIR/changelog.js $TAG_DEST '' $previousTag --lite)
-changelog_final=$(echo "$($THIS_SCRIPT_DIR/changelog.js $TAG_DEST '' $previousTag --lite)" | head -1 ) > CHANGELOG_HTML
+changelog_final=$(echo "$($THIS_SCRIPT_DIR/changelog.js $TAG_DEST '' $previousTag --lite)" | head -1 ) 
  
-$($THIS_SCRIPT_DIR/to_html.rb --md "${changelog}")
+$THIS_SCRIPT_DIR/to_html.rb --md "${changelog}" > CHANGELOG_HTML
 
 envman add --key CHANGELOG --value "${changelog_final}"
 
