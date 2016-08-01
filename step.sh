@@ -37,7 +37,7 @@ fi
 changelog=$($THIS_SCRIPT_DIR/changelog.js $TAG_DEST '' $previousTag --lite)
 changelog_final=$(echo "$($THIS_SCRIPT_DIR/changelog.js $TAG_DEST '' $previousTag --lite)" | head -1 ) 
  
-$THIS_SCRIPT_DIR/to_html.rb --md "${changelog}" > CHANGELOG_HTML
+$THIS_SCRIPT_DIR/to_html.rb --md "${changelog}" > changelog.html
 
 envman add --key CHANGELOG --value "${changelog_final}"
 
