@@ -8,7 +8,10 @@ cd $THIS_SCRIPT_DIR
 npm install
 gem install redcarpet
 cd $BITRISE_SOURCE_DIR
-
+tag_head=$(git tag --points-at HEAD)
+if [ "$tag_head"  != "" ]; then
+  TAG_DEST=$tag_head
+fi
 
 if [ "$TAG_DEST" != "HEAD" ]; then
   git checkout ${TAG_DEST}~1
