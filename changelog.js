@@ -294,8 +294,7 @@ var LINK_FEATURE = "[%s](https://wiki.services.local/dosearchsite.action?spaceSe
   exports.printSection = printSection;
   // hacky start if not run by jasmine :-D
   //console.error(child);
-
-  if (process.argv[5].indexOf("lite")>0){
+  if (process.argv.length > 5 && process.argv[5].indexOf("lite")>0){
   
     lite=true;
   }

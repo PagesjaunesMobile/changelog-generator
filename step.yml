@@ -28,7 +28,7 @@ inputs:
       is_expand: true
       is_required: true
       is_dont_change_value: true
-  - CHANGE_FILE: ""
+  - CHANGE_FILE: $CHANGE_FILE
     opts:
       title: "the changelog file"
       description: ""
