@@ -25,12 +25,13 @@ git checkout ${TAG_DEST}
 
 
 if [ -n "$CHANGE_FILE" ] ; then
-  if [ -z "$(git config user.name)"]; then
+  if [ -z "$(git config user.name)" ]; then
     git config user.email $IC_COMMITER_MAIL
     git config user.name $IC_COMMITER_NAME
   fi
+  
   touch $CHANGE_FILE
-  ALREADY="$(grep "^# ${TAG_DEST}" $CHANGE_FILE|| true)"
+  ALREADY="$(grep "^# ${TAG_DEST}" $CHANGE_FILE || true)"
   
   # or ALREADY = tag <> HEAD
   if [ -z "$ALREADY" ]; then 
