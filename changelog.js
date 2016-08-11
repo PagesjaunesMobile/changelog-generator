@@ -26,14 +26,14 @@ var lite = false;
 var GIT_LOG_CMD = 'git log --invert-grep --grep="%s" -E --format=%s %s..%s';
 var GIT_TAG_CMD = 'git describe --tags --abbrev=0';
 var GIT_TAG_DATE_CMD = 'git log -1 --format=%ai %s';
-var HEADER_TPL = '<a name="%s"></a>\n# %s (%s)\n\n';
-var HEADLESS_TPL = 'Last commit _%s\n\n';
+var HEADER_TPL = "\n<a name='%s'></a>\n# %s (%s)\n\n";
+var HEADLESS_TPL = "Last commit _%s\n\n";
 var LINK_ISSUE_LITE = '[#%s]';
 var LINK_FEATURE_LITE = "[%s]";
 var LINK_COMMIT_LITE = '[%s]';
-var LINK_ISSUE = '[#%s](process.env.ISSUE_TRACKER/%s)';
+var LINK_ISSUE = '[#%s](' + process.env.ISSUE_TRACKER + '/%s)';
 var LINK_FEATURE = "[%s](https://wiki.services.local/dosearchsite.action?spaceSearch=false&queryString='%s')";
-  var LINK_COMMIT = '([%s](process.env.GIT_COMMIT_LINK/%s))';
+  var LINK_COMMIT = '([%s](' + process.env.GIT_COMMIT_LINK + '/%s))';
 
   var EMPTY_COMPONENT = '$$';
 
@@ -138,22 +138,22 @@ var LINK_FEATURE = "[%s](https://wiki.services.local/dosearchsite.action?spaceSe
     printCommitLinks = printCommitLinks === undefined ? true : printCommitLinks;
     var components = Object.getOwnPropertyNames(section).sort();
 
-    if (!components.length || components[0]=="$$" ){
+    if (!components.length || components[0]==EMPTY_COMPONENT ){
       return;
     };
 
-    stream.write(util.format('\n## %s\n\n', title));
+    stream.write(util.format('\n\n## %s', title));
     components.forEach(function(name) {
-      var prefix = '-';
+      var prefix = "\n  -";
       var nested = section[name].length > 1;
 
       if (name !== EMPTY_COMPONENT) {
         if (nested) {
 
-          stream.write(util.format('- **%s:**\n', name));
-          prefix = '  -';
+          stream.write(util.format("\n  - **%s:**\n", name));
+          prefix = "\n    -";
         } else {
-          prefix = util.format('- **%s:**', name);
+          prefix = util.format("\n  - **%s:**", name);
         }
       }
 
@@ -165,14 +165,14 @@ var LINK_FEATURE = "[%s](https://wiki.services.local/dosearchsite.action?spaceSe
           {
             stream.write(linkToCommit(commit.hash));
           } else {
-            stream.write(util.format('%s %s\n  %s', prefix, commit.subject, linkToCommit(commit.hash)));
+            stream.write(util.format("%s %s\n  %s", prefix, commit.subject, linkToCommit(commit.hash)));
           }
           if (commit.closes.length) {
-            stream.write(',\n   ' + commit.closes.map(linkToIssue).join(', '));
+            stream.write(",\n   " + commit.closes.map(linkToIssue).join(', '));
           }
         } else {
           if (doublon != commit.subject){
-            stream.write(util.format('%s %s\n', prefix, commit.subject));
+            stream.write(util.format("%s %s\n", prefix, commit.subject));
           }
         }
         doublon=commit.subject;
@@ -242,7 +242,8 @@ var LINK_FEATURE = "[%s](https://wiki.services.local/dosearchsite.action?spaceSe
     printSection(stream, 'Performance Improvements', sections.perf);
     printSection(stream, 'Breaking Changes', sections.breaks, false);
     printSection(stream, 'non conforme', sections.bof);
-    stream.write(data);
+    console.error("End ", data.length);
+    stream.write("\n\n" + data);
   };
 
 

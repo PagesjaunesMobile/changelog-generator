@@ -10,14 +10,14 @@ gem install redcarpet
 cd $BITRISE_SOURCE_DIR
 
 if [ "$TAG_DEST" = "HEAD" ]; then
-  tag_head=$(git tag --points-at HEAD)
-  if [ -n "$tag_head" ]; then
-    TAG_DEST=$tag_head
-  fi
+     tag_head=$(git tag --points-at HEAD)
+     if [ -n "$tag_head" ]; then
+       TAG_DEST=$tag_head
+     fi
 fi
 
 if [ "$TAG_DEST" != "HEAD" ]; then
-  git checkout ${TAG_DEST}~1
+     git checkout ${TAG_DEST}~1
 fi
 
 previousTag=$(git describe --tags --abbrev=0)
@@ -36,11 +36,13 @@ if [ -n "$CHANGE_FILE" ] ; then
   # or ALREADY = tag <> HEAD
   if [ -z "$ALREADY" ]; then 
     $THIS_SCRIPT_DIR/changelog.js $TAG_DEST "${CHANGE_FILE}" $previousTag
-    GIT_ASKPASS=echo 
-    GIT_SSH="${THIS_SCRIPT_DIR}/ssh_no_prompt.sh"
-    git add $CHANGE_FILE
-    git commit -m "chore(${TAG_DEST}):update changes"
-    git push origin HEAD:$BITRISE_GIT_BRANCH
+    if $CI ; then
+      GIT_ASKPASS=echo 
+      GIT_SSH="${THIS_SCRIPT_DIR}/ssh_no_prompt.sh"
+      git add $CHANGE_FILE
+      git commit -m "chore(${TAG_DEST}):update changes"
+      git push origin HEAD:$BITRISE_GIT_BRANCH
+    fi
   fi
 fi
 #git log --invert-grep --grep="^Merge" -E --format=%H%n%s%n%b%n%an%n==END== ${previousTag}..${TAG_DEST}
