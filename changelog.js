@@ -27,7 +27,7 @@ var GIT_LOG_CMD = 'git log --invert-grep --grep="%s" -E --format=%s %s..%s';
 var GIT_TAG_CMD = 'git describe --tags --abbrev=0';
 var GIT_TAG_DATE_CMD = 'git log -1 --format=%ai %s';
 var HEADER_TPL = "\n<a name='%s'></a>\n# %s (%s)\n\n";
-var HEADLESS_TPL = "Last commit _%s\n\n";
+var HEADLESS_TPL = "";
 var LINK_ISSUE_LITE = '[#%s]';
 var LINK_FEATURE_LITE = "[%s]";
 var LINK_COMMIT_LITE = '[%s]';
@@ -55,7 +55,7 @@ var LINK_FEATURE = "[%s](https://wiki.services.local/dosearchsite.action?spaceSe
     msg.breaks = [];
 
     lines.forEach(function(line) {
-      match = line.match(/(?:Closes|Fixes|Features)\s#?([A-Z0-9_\-]+)/);
+      match = line.match(/(?:Closes|Fixes|Features|closes|fixes|features)\s#?([A-Z0-9_\-]+)/);
       if (match) msg.closes.push(match[1]);
     });
 
@@ -66,7 +66,7 @@ var LINK_FEATURE = "[%s](https://wiki.services.local/dosearchsite.action?spaceSe
       msg.breaking = match[1];
     }
 
-    var featType= ["Pods", "Pod", "Config", "Conf", "Feat", "Refactor"];
+    var featType= ["pods", "pod", "config", "conf", "feat", "refactor", "codereview"];
     msg.body = lines.join('\n');
     if(msg.subject.indexOf('Merge ')<0){
       match = msg.subject.match(/^(.*)\((.*)\)\s*\:\s*(.*)$/);
@@ -82,11 +82,13 @@ var LINK_FEATURE = "[%s](https://wiki.services.local/dosearchsite.action?spaceSe
         // console.log("\nHERE >>>>> %s \n>>>> %s\n ", msg.subject, msg.body);
       } else {
         msg.type = match[1].toLowerCase();
+        var prefixe = "";
         if (featType.indexOf(msg.type)>-1) {
+          prefixe = "[" + msg.type + "] - "
           msg.type="feat"
         }
         msg.component = match[2];
-        msg.subject = match[3];
+        msg.subject = prefixe + match[3];
       }
       return msg;
     } else
@@ -268,19 +270,23 @@ var LINK_FEATURE = "[%s](https://wiki.services.local/dosearchsite.action?spaceSe
       return stdout;
     });
 
-    if(from==null || to == "HEAD"){
+    if(from==null){
       getPreviousTag().then(function(tag) {
         console.error('Reading git log since', tag);
         readGitLog('^Merge', tag, "HEAD").then(function(commits) {
           console.error('Parsed', commits.length, 'commits');
           console.error('Generating changelog to', file || 'stdout', '(', to, ')');
           //  console.error('>>>>>>',commits[0],'<<<<<')
-          writeChangelog(data, stream, commits, to, commits[0].subject + "_ (" + authorCommit(commits[0].body) + ")");
+          writeChangelog(data, stream, commits, to, tagDate);
         });
       });
     } else {
       console.error('Reading git log between %s and %s (%s)', from, to, tagDate.toString());
       readGitLog('^Merge', from, to).then(function(commits) {
+        if (to=="HEAD"){
+          commits[0].subject = commits[0].subject + " *Last*";
+          tagDate = ""; // commits[0].subject + commits[0].subject+ commits[0].subject + "_ (" + authorCommit(commits[0].body) + ")"
+        }
         console.error('Parsed', commits.length, 'commits');
         console.error('Generating changelog to', file || 'stdout', '(', to, ')');
         writeChangelog(data, stream, commits, to, tagDate);
@@ -301,7 +307,7 @@ var LINK_FEATURE = "[%s](https://wiki.services.local/dosearchsite.action?spaceSe
   }
 
   var file = process.argv[3];
-
+console.error(process.argv[4])
   var chunk='';
   if (file){
     var streamOld = fs.createReadStream(file, {encoding: 'utf8'});
@@ -314,7 +320,6 @@ var LINK_FEATURE = "[%s](https://wiki.services.local/dosearchsite.action?spaceSe
     });
 
     streamOld.on( 'end' ,  function ()  {
-      console.error("here "+ chunk.length);
       console.error( 'Read completed successfully.' );
       generate(chunk, file, process.argv[2], process.argv[4]);
     });

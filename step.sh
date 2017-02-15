@@ -11,6 +11,8 @@ cd $BITRISE_SOURCE_DIR
 
 if [ "$TAG_DEST" = "HEAD" ]; then
      tag_head=$(git tag --points-at HEAD)
+     previousTag=$(git rev-list --parents HEAD | head -1| cut -d' ' -f2)
+     
      if [ -n "$tag_head" ]; then
        TAG_DEST=$tag_head
      fi
@@ -18,9 +20,9 @@ fi
 
 if [ "$TAG_DEST" != "HEAD" ]; then
      git checkout ${TAG_DEST}~1
+     previousTag=$(git describe --tags --abbrev=0)
 fi
 
-previousTag=$(git describe --tags --abbrev=0)
 git checkout ${TAG_DEST}
 
 
@@ -47,7 +49,7 @@ if [ -n "$CHANGE_FILE" ] ; then
 fi
 #git log --invert-grep --grep="^Merge" -E --format=%H%n%s%n%b%n%an%n==END== ${previousTag}..${TAG_DEST}
 changelog=$($THIS_SCRIPT_DIR/changelog.js $TAG_DEST '' $previousTag --lite)
-changelog_final=$(echo "$($THIS_SCRIPT_DIR/changelog.js $TAG_DEST '' $previousTag --lite)" | head -1 ) 
+changelog_final=$(echo "$($THIS_SCRIPT_DIR/changelog.js $TAG_DEST '' $previousTag --lite)") 
  
 $THIS_SCRIPT_DIR/to_html.rb --md "${changelog}" > changelog.html
 
