@@ -10,17 +10,21 @@ gem install redcarpet
 cd $BITRISE_SOURCE_DIR
 
 if [ "$TAG_DEST" = "HEAD" ]; then
-     tag_head=$(git tag --points-at HEAD)
-     previousTag=$(git rev-list --parents HEAD | head -1| cut -d' ' -f2)
-     
-     if [ -n "$tag_head" ]; then
-       TAG_DEST=$tag_head
-     fi
+  tag_head=$(git tag --points-at HEAD)
+  if [[ "$BITRISE_GIT_BRANCH" =~ (develop|master|release) ]]; then   
+    previousTag=$(git rev-list --parents HEAD | head -1| cut -d' ' -f2)
+  else
+    previousTag=$(git merge-base HEAD develop) 
+  fi
+  
+  if [ -n "$tag_head" ]; then
+    TAG_DEST=$tag_head
+  fi
 fi
 
 if [ "$TAG_DEST" != "HEAD" ]; then
-     git checkout ${TAG_DEST}~1
-     previousTag=$(git describe --tags --abbrev=0)
+  git checkout ${TAG_DEST}~1
+  previousTag=$(git describe --tags --abbrev=0)
 fi
 
 git checkout ${TAG_DEST}

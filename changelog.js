@@ -55,7 +55,7 @@ var LINK_FEATURE = "[%s](https://wiki.services.local/dosearchsite.action?spaceSe
     msg.breaks = [];
 
     lines.forEach(function(line) {
-      match = line.match(/(?:Closes|Fixes|Features|closes|fixes|features)\s#?([A-Z0-9_\-]+)/);
+      match = line.toLowerCase().match(/(?:closes|fixes|features)\s#?([A-Z0-9_\-]+)/);
       if (match) msg.closes.push(match[1]);
     });
 
@@ -66,7 +66,7 @@ var LINK_FEATURE = "[%s](https://wiki.services.local/dosearchsite.action?spaceSe
       msg.breaking = match[1];
     }
 
-    var featType= ["pods", "pod", "config", "conf", "feat", "refactor", "codereview"];
+    var featType= [ "feat", "pods", "pod", "config", "conf", "refactor", "codereview"];
     msg.body = lines.join('\n');
     if(msg.subject.indexOf('Merge ')<0){
       match = msg.subject.match(/^(.*)\((.*)\)\s*\:\s*(.*)$/);
@@ -83,7 +83,7 @@ var LINK_FEATURE = "[%s](https://wiki.services.local/dosearchsite.action?spaceSe
       } else {
         msg.type = match[1].toLowerCase();
         var prefixe = "";
-        if (featType.indexOf(msg.type)>-1) {
+        if (featType.indexOf(msg.type)>0) {
           prefixe = "[" + msg.type + "] - "
           msg.type="feat"
         }
