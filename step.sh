@@ -14,7 +14,7 @@ if [ "$TAG_DEST" = "HEAD" ]; then
   if [[ "$BITRISE_GIT_BRANCH" =~ (develop|master|release) ]]; then   
     previousTag=$(git rev-list --parents HEAD | head -1| cut -d' ' -f2)
   else
-    previousTag=$(git merge-base HEAD develop) 
+    previousTag=$(git merge-base HEAD origin/develop) 
   fi
   
   if [ -n "$tag_head" ]; then
