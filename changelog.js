@@ -55,8 +55,9 @@ var LINK_FEATURE = "[%s](https://wiki.services.local/dosearchsite.action?spaceSe
     msg.breaks = [];
 
     lines.forEach(function(line) {
-      match = line.toLowerCase().match(/(?:closes|fixes|features)\s#?([A-Z0-9_\-]+)/);
-      if (match) msg.closes.push(match[1]);
+
+      match = line.toLowerCase().match(/(?:closes|fixes|features)\s#?([a-z0-9_\-]+)/);
+      if (match) msg.closes.push(match[1].toUpperCase());
     });
 
     match = raw.match(/BREAKING CHANGE:([\s\S]*)/);
@@ -175,6 +176,9 @@ var LINK_FEATURE = "[%s](https://wiki.services.local/dosearchsite.action?spaceSe
         } else {
           if (doublon != commit.subject){
             stream.write(util.format("%s %s\n", prefix, commit.subject));
+          }
+          if (commit.closes.length) {
+            stream.write(",\n   " + commit.closes.map(linkToIssue).join(', '));
           }
         }
         doublon=commit.subject;
