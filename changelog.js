@@ -240,7 +240,8 @@ var LINK_FEATURE = "[%s](https://wiki.services.local/dosearchsite.action?spaceSe
     if (version == "HEAD") {
       stream.write(util.format(HEADLESS_TPL, date));
     } else {
-      stream.write(util.format(HEADER_TPL, version, version, currentDate(date)));
+      var version_l = version.replace(/-.*$/, "");
+      stream.write(util.format(HEADER_TPL, version_l, version, currentDate(date)));
     }
   
     printSection(stream, 'Bug Fixes', sections.fix);
