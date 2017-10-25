@@ -55,7 +55,7 @@ fi
 changelog=$($THIS_SCRIPT_DIR/changelog.js $TAG_DEST '' $previousTag --lite)
 changelog_final=$(echo "$($THIS_SCRIPT_DIR/changelog.js $TAG_DEST '' $previousTag --lite)") 
 if [[ ! -z "$changelog" ]]; then
-  $THIS_SCRIT_DIR/to_html.rb --md "${changelog}" > changelog.html 
+  $THIS_SCRIPT_DIR/to_html.rb --md "${changelog}" > changelog.html 
 fi
 envman add --key CHANGELOG --value "${changelog_final}"
 
