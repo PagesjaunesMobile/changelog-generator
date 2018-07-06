@@ -11,10 +11,10 @@ cd $BITRISE_SOURCE_DIR
 
 if [ "$TAG_DEST" = "HEAD" ]; then
   tag_head=$(git tag --points-at HEAD)
-  if [[ "$BITRISEIO_GIT_BRANCH_DEST" =~ (develop|master|release) ]]; then   
+  if [[ "$BITRISE_GIT_BRANCH" =~ (develop|master|release) ]]; then   
     previousTag=$(git rev-list --parents HEAD | head -1| cut -d' ' -f2)
   else
-    previousTag=$(git merge-base HEAD origin/develop) 
+    previousTag=$(diff -u <(git rev-list --first-parent HEAD) <(git rev-list --first-parent origin/develop) | sed -ne 's/^ //p' | head -1) 
   fi
   
   if [ -n "$tag_head" ]; then
