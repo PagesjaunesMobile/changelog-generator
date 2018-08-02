@@ -14,7 +14,11 @@ if [ "$TAG_DEST" = "HEAD" ]; then
   if [[ "$BITRISE_GIT_BRANCH" =~ (develop|master|release) ]]; then   
     previousTag=$(git rev-list --parents HEAD | head -1| cut -d' ' -f2)
   else
-    previousTag=$(diff -u <(git rev-list --first-parent HEAD) <(git rev-list --first-parent "origin/${BITRISEIO_GIT_BRANCH_DEST}") | sed -ne 's/^ //p' | head -1) 
+  base_branch="develop"
+  if [ -n "$BITRISEIO_GIT_BRANCH_DEST" ]; then
+    base_branch=$BITRISEIO_GIT_BRANCH_DEST
+  fi
+    previousTag=$(diff -u <(git rev-list --first-parent HEAD) <(git rev-list --first-parent "origin/${base_branch}") | sed -ne 's/^ //p' | head -1) 
   fi
   
   if [ -n "$tag_head" ]; then
