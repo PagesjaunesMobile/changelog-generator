@@ -18,7 +18,7 @@ if [ "$TAG_DEST" = "HEAD" ]; then
   if [ -n "$BITRISEIO_GIT_BRANCH_DEST" ]; then
     base_branch=$BITRISEIO_GIT_BRANCH_DEST
   fi
-    previousTag=$(diff -u <(git rev-list --first-parent HEAD) <(git rev-list --first-parent "origin/${base_branch}") | sed -ne 's/^ //p' | head -1) 
+    previousTag=$(git merge-base $BITRISE_GIT_BRANCH $BITRISEIO_GIT_BRANCH_DEST) 
   fi
   
   if [ -n "$tag_head" ]; then
