@@ -50,7 +50,7 @@ if [ -n "$CHANGE_FILE" ] ; then
       GIT_ASKPASS=echo 
       GIT_SSH="${THIS_SCRIPT_DIR}/ssh_no_prompt.sh"
       git add $CHANGE_FILE
-      git commit -m "chore(${TAG_DEST}):update changes"
+      git commit -m "chore(${TAG_DEST}):update changes [skip ci]"
       git push origin HEAD:$BITRISE_GIT_BRANCH
     fi
   fi
