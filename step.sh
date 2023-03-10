@@ -6,18 +6,17 @@ THIS_SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 cd $THIS_SCRIPT_DIR
 npm install
-gem install redcarpet
+gem install --no-document redcarpet 
 cd $BITRISE_SOURCE_DIR
-
 if [ "$TAG_DEST" = "HEAD" ]; then
   tag_head=$(git tag --points-at HEAD)
   if [[ "$BITRISE_GIT_BRANCH" =~ (develop|master|release) ]]; then   
     previousTag=$(git rev-list --parents HEAD | head -1| cut -d' ' -f2)
   else
-  base_branch="develop"
-  if [ -n "$BITRISEIO_GIT_BRANCH_DEST" ]; then
-    base_branch=$BITRISEIO_GIT_BRANCH_DEST
-  fi
+    base_branch="develop"
+    if [ -n "$BITRISEIO_GIT_BRANCH_DEST" ]; then
+      base_branch=$BITRISEIO_GIT_BRANCH_DEST
+    fi
     previousTag=$(git merge-base $BITRISE_GIT_BRANCH $BITRISEIO_GIT_BRANCH_DEST) 
   fi
   
@@ -27,11 +26,11 @@ if [ "$TAG_DEST" = "HEAD" ]; then
 fi
 
 if [ "$TAG_DEST" != "HEAD" ]; then
-  git checkout ${TAG_DEST}~1
+  git -c core.hooksPath=/dev/null checkout ${TAG_DEST}~1
   previousTag=$(git describe --tags --abbrev=0)
 fi
 
-git checkout ${TAG_DEST}
+git -c core.hooksPath=/dev/null checkout ${TAG_DEST}
 
 
 if [ -n "$CHANGE_FILE" ] ; then
