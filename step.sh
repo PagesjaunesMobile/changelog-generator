@@ -6,9 +6,8 @@ THIS_SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 cd $THIS_SCRIPT_DIR
 npm install
-gem install redcarpet
+gem install --no-document redcarpet 
 cd $BITRISE_SOURCE_DIR
-
 if [ "$TAG_DEST" = "HEAD" ]; then
   tag_head=$(git tag --points-at HEAD)
   if [[ "$BITRISE_GIT_BRANCH" =~ (develop|master|release) ]]; then   
@@ -27,11 +26,11 @@ if [ "$TAG_DEST" = "HEAD" ]; then
 fi
 
 if [ "$TAG_DEST" != "HEAD" ]; then
-  git checkout ${TAG_DEST}~1
+  git -c core.hooksPath=/dev/null checkout ${TAG_DEST}~1
   previousTag=$(git describe --tags --abbrev=0)
 fi
 
-git checkout ${TAG_DEST}
+git -c core.hooksPath=/dev/null checkout ${TAG_DEST}
 
 
 if [ -n "$CHANGE_FILE" ] ; then
