@@ -1,3 +1,0 @@
-{ "name" : "changelog"
-, "version" : "1.0.0"
-, "dependencies" : { "qq" : "0.3.5", "micromarkdown" : "0.3.4" } }
