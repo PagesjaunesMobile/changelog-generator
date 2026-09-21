@@ -19,6 +19,9 @@ is_always_run: false
 is_skippable: false
 dependencies: []
 run_if: ""
+toolkit:
+  go:
+    package_name: changelog-generator
 inputs:
   - TAG_DEST: ""
     opts:
