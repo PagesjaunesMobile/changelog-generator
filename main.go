@@ -58,15 +58,18 @@ func main() {
 	branch := os.Getenv("BITRISE_GIT_BRANCH")
 
 	var previousTag string
+	noHistory := false // HEAD without parent (shallow clone): nothing to generate
 	if tagDest == "HEAD" {
 		// as in branch test_origin: the changelog of HEAD always starts at its first parent
 		tagHead := capture(srcDir, false, "git", "tag", "--points-at", "HEAD")
 		first := strings.SplitN(capture(srcDir, false, "git", "rev-list", "--parents", "HEAD"), "\n", 2)[0]
 		fields := strings.Fields(first)
 		if len(fields) < 2 {
-			fail("HEAD has no parent")
+			fmt.Fprintln(os.Stderr, "WARNING: HEAD has no parent (shallow clone?), empty changelog")
+			noHistory = true
+		} else {
+			previousTag = fields[1]
 		}
-		previousTag = fields[1]
 		if tagHead != "" {
 			tagDest = tagHead
 		}
@@ -107,7 +110,7 @@ func main() {
 			}
 		}
 
-		if !already {
+		if !already && !noHistory {
 			if _, err := generateChangelog(srcDir, tagDest, changePath, previousTag, false); err != nil {
 				fail("changelog generation failed: %v", err)
 			}
@@ -120,11 +123,14 @@ func main() {
 		}
 	}
 
-	changelog, err := generateChangelog(srcDir, tagDest, "", previousTag, true)
-	if err != nil {
-		fail("changelog generation failed: %v", err)
+	changelog := ""
+	if !noHistory {
+		var err error
+		if changelog, err = generateChangelog(srcDir, tagDest, "", previousTag, true); err != nil {
+			fail("changelog generation failed: %v", err)
+		}
+		changelog = strings.TrimRight(changelog, "\n") // like $(...) in the shell
 	}
-	changelog = strings.TrimRight(changelog, "\n") // like $(...) in the shell
 
 	if changelog != "" { // as in branch test_origin: no changelog.html for an empty changelog
 		// to_html.rb: `puts markdown.render(md)` adds a newline only when the output lacks one
